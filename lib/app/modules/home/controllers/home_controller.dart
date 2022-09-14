@@ -6,8 +6,13 @@ import 'package:studyapp/app/modules/home/model/course_model.dart';
 class HomeController extends GetxController with StateMixin{
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
   late final CollectionReference _collection;
-
+  
+ var s =  ''.obs;
  var courseList = <CourseModel> [].obs;
+ TextEditingController courseNameController = TextEditingController();
+ TextEditingController courseDescriptionController = TextEditingController();
+ TextEditingController courseImageController = TextEditingController();
+ TextEditingController courseAuthorController = TextEditingController();
  
   @override
   void onInit() {
@@ -17,25 +22,28 @@ class HomeController extends GetxController with StateMixin{
   }
 
 
- Future<void> addCourse({
-    required String courseName,
-    required String description,
-    required String author,
-    required String courseImageUrl
-  }) async {
-    DocumentReference documentReference =
-        _collection.doc();
+ Future<void> addCourse() async {
+    if(!validateCourse()){
+      return;
+    }
 
-    Map<String, dynamic> data = <String, dynamic>{
-      "CourseName": courseName,
-      "Description": description,
-      "Author" : author,
-      "CourseImageUrl":courseImageUrl
+    Map<String, dynamic> newCourse = <String, dynamic>{
+      "CourseName": courseNameController.text.trim(),
+      "Description": courseDescriptionController.text.trim(),
+      "Author" : courseAuthorController.text.trim(),
+      "CourseImageUrl":courseImageController.text.trim()
     };
 
-    await documentReference
-        .set(data)
+    await _collection.doc()
+        .set(newCourse)
         .whenComplete(() {
+          Get.back();
+           Get.defaultDialog(
+            barrierDismissible: true,
+            title: "Success",
+            middleText: "Course added Successfully!",
+            //onConfirm: readCourses,
+             );
           readCourses();
         })
         .catchError((e) {
@@ -43,23 +51,42 @@ class HomeController extends GetxController with StateMixin{
         });
   }
 
+  validateCourse(){
+    if(courseNameController.text.trim()==""){
+      Get.snackbar("Fill Course details", "Course Name Cannot be empty!");
+      return false;
+    }else if(courseDescriptionController.text.trim()==""){
+      Get.snackbar("Fill Course details", "Course Description Cannot be empty!");
+      return false;
+    }else if(courseAuthorController.text.trim()==""){
+      Get.snackbar("Fill Course details", "Course Author Cannot be empty!");
+      return false;
+    }else if(courseImageController.text.trim()==""){
+      Get.snackbar("Fill Course details", "Course Image Url Cannot be empty!");
+      return false;
+    }else{
+      return true;
+    }
+  }
+
 
    readCourses() {
-     _collection.get().then((QuerySnapshot query){
+     _collection.get(const GetOptions(source: Source.server)).then((QuerySnapshot query){
         courseList.value = [];
         for (var element in query.docs) {
           courseList.add(CourseModel.fromDocumentSnapshot(element));
+          s.value = query.metadata.isFromCache?"cache" :"from server";
         }
     }).onError((error, stackTrace) {
         Get.defaultDialog(
-            barrierDismissible: false,
+            barrierDismissible: true,
             title: "Error",
             middleText: "Please Try Again!",
             onConfirm: readCourses,
              );
     }).catchError((error){
       Get.defaultDialog(
-            barrierDismissible: false,
+            barrierDismissible: true,
             title: "Error",
             middleText: "Please Try Again!",
             onConfirm: readCourses,
