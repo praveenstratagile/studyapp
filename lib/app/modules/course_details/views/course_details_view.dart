@@ -1,121 +1,84 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:studyapp/app/modules/home/model/course_model.dart';
+import 'package:studyapp/app/modules/course_details/model/Lesson_model.dart';
 
-import '../controllers/home_controller.dart';
+import '../controllers/course_details_controller.dart';
 
-class HomeView extends GetView<HomeController> {
-  const HomeView({Key? key}) : super(key: key);
+class CourseDetailsView extends GetView<CourseDetailsController> {
+  const CourseDetailsView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title:  Text(controller.s.value),
-          centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_circle_down_sharp),
-            onPressed: () {
-              controller.readCourses();
-            },
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
+      appBar: AppBar(
+        title: const Text('Lessons'),
+        centerTitle: true,
+      ),
+      floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
-          onPressed: () {
+          onPressed: (){
             controller.clearTextField();
-            Get.bottomSheet(addCourse(),isScrollControlled: true);
-          // controller.addCourse(
-          //     courseName: "Flutter",
-          //     description: "Google Flutter",
-          //     author: "Praveen",
-          //     courseImageUrl:
-          //         "https://uploads-ssl.webflow.com/5f841209f4e71b2d70034471/60bb4a2e143f632da3e56aea_Flutter%20app%20development%20(2).png");
-        }),
-        body: Obx(() => 
+            Get.bottomSheet(addLesson(),isScrollControlled: true);
+          },
+          ),
+      body:Obx(() => 
         controller.loading.value?
         const Center(child:  CircularProgressIndicator()): 
-        controller.courseList.isEmpty?
-        const Center(child: Text("Course List is Empty!"),):
+        controller.lessonList.isEmpty?
+        const Center(child: Text("Lesson List is Empty!"),):
         Container(
           padding: const EdgeInsets.only(left:15,right:15),
           height:Get.height,
-          // child: ListWheelScrollView(
-          //   itemExtent: Get.height/1.5,
-          //   children: List.generate(
-          //     controller.courseList.length, 
-          //     (index) => courseCard(controller.courseList[index])),
             child:ListView.builder(
-              itemCount: controller.courseList.length,
-              itemBuilder: ((context, index) => courseCard(controller.courseList[index]))),
+              itemCount: controller.lessonList.length,
+              itemBuilder: ((context, index) => lessonCard(controller.lessonList[index],index))),
         )
         ));
   }
 
 
-  Widget courseCard(CourseModel course){
+    Widget lessonCard(LessonModel lesson,int index){
       return InkWell(
-        onTap: (){
-          controller.viewCourse(course.courseId!);
+        onTap:(){
+          controller.gotoLessonDetailsPage(lesson);
         },
         child: Container(
           margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             color: Colors.white,
-            // boxShadow: const [
-            //    BoxShadow(
-            //     color: Colors.blue,
-            //     blurRadius: 5,
-            //     spreadRadius: 5,
-            //    )
-            //   ]
+          
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(15),
-                  topRight: Radius.circular(15)
-                  ),
-                child: Image.network(course.courseImageUrl??"",fit: BoxFit.cover,width: Get.width,
-                errorBuilder: (context, error, stackTrace) => const SizedBox(),
-                )),
+              
               const SizedBox(height: 10,),
-              Align(
-                alignment: Alignment.center,
-                child: Text("${course.courseName}",
-                    style: const TextStyle(color: Colors.blue,fontWeight: FontWeight.w500,fontSize: 20),
-                    textAlign: TextAlign.center,
-                ),
+              Text("${(index+1).toString()}. ${lesson.lessonName}",
+                  style: const TextStyle(color: Colors.blue,fontWeight: FontWeight.w500,fontSize: 20),
+                  textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10,),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text("Author: ${course.author}",
+                child: Text("${lesson.description}",
                     style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 15),
                     textAlign: TextAlign.left,
       
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 15),
-                              child: Text("${course.description}",
-                  style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 13),
-                ),
-              ),
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  IconButton(onPressed: ()=>controller.viewCourse(course.courseId!), icon: const Icon(Icons.play_circle_fill_rounded,color: Colors.blue,),),
+                  //IconButton(onPressed: ()=>controller.viewCourse(course.courseId!), icon: const Icon(Icons.play_circle_fill_rounded,color: Colors.blue,),),
                   IconButton(onPressed: (){
-                    controller.setTextFieldValues(course);
-                    Get.bottomSheet(addCourse(update: true,courseId: course.courseId??""),
+                    controller.setTextFieldValues(lesson);
+                    Get.bottomSheet(addLesson(update: true,lessonId: lesson.lessonId??""),
                   isScrollControlled: true);},
                    icon: const Icon(Icons.edit_note_rounded,color: Colors.blue,),),
-                  IconButton(onPressed: ()=>controller.deleteCourse(course.courseId!), icon: const Icon(Icons.delete_rounded,color: Colors.red,),)
+                  IconButton(onPressed: ()=>controller.deleteLesson(lesson.lessonId!), icon: const Icon(Icons.delete_rounded,color: Colors.red,),)
                 ],
                 )
           ]),
@@ -123,7 +86,8 @@ class HomeView extends GetView<HomeController> {
       );
   }
 
-  Widget addCourse({bool update=false,String? courseId}){
+
+    Widget addLesson({bool update=false,String? lessonId}){
     return Stack(
       children: [
         Container(
@@ -151,7 +115,7 @@ class HomeView extends GetView<HomeController> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(width: 24,),
-                  Text(update?"Update Course Details":"Add New Course",
+                  Text(update?"Update Lesson Details":"Add New Lesson",
                               style:const  TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w500,
@@ -161,11 +125,10 @@ class HomeView extends GetView<HomeController> {
                 ],
               ),
             ),    
-            textEditor(controller.courseNameController,"Course Name"),
-            textEditor(controller.courseDescriptionController,"Course Description"),
-            textEditor(controller.courseAuthorController,"Author Name"),
-            textEditor(controller.courseImageController,"Course Image Url"),
-            createCourseButton(update,courseId),
+            textEditor(controller.lessonNameController,"Lesson Name"),
+            textEditor(controller.lessonDescriptionController,"Lesson Description"),
+            textEditor(controller.lessonVideoController,"Youtube Video Url"),
+            createCourseButton(update,lessonId),
             const SizedBox(height: 30,)
           ]),
         ),
@@ -175,7 +138,7 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  Widget createCourseButton(bool update,String? courseId){
+  Widget createCourseButton(bool update,String? lessonId){
     return Padding(
       padding: const EdgeInsets.all(25),
       child: ElevatedButton(
@@ -185,7 +148,7 @@ class HomeView extends GetView<HomeController> {
           width: Get.width,
           child:  Text(update?"Update":"Submit")),
         onPressed: (){
-          controller.addCourse(update,courseId: courseId);
+          controller.addLesson(update,lessonId: lessonId);
         },
         ),
       );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:studyapp/app/modules/home/bindings/home_binding.dart';
 import 'package:studyapp/app/modules/home/views/home_view.dart';
+import 'package:studyapp/app/routes/app_pages.dart';
 import 'package:studyapp/firebase_options.dart';
 
 Future<void> main() async{
@@ -12,6 +13,7 @@ Future<void> main() async{
 );
   runApp(  GetMaterialApp(
     initialBinding: HomeBinding(),
-    home:const HomeView(),
+    getPages: AppPages.routes,
+    initialRoute: AppPages.INITIAL,
     ));
 }
