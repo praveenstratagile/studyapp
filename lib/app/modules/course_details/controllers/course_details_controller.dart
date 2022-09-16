@@ -59,7 +59,7 @@ class CourseDetailsController extends GetxController {
 
   getLessons()async{
     loading.value =true;
-    await _collection.get().then((QuerySnapshot query) {
+    await _collection.orderBy('Index', descending: false).get().then((QuerySnapshot query) {
        lessonList.value = [];
         for (var element in query.docs) {
           lessonList.add(LessonModel.fromDocumentSnapshot(element));

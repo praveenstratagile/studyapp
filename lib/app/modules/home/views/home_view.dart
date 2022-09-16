@@ -124,54 +124,50 @@ class HomeView extends GetView<HomeController> {
   }
 
   Widget addCourse({bool update=false,String? courseId}){
-    return Stack(
-      children: [
-        Container(
-          //height: Get.height-Get.statusBarHeight,
-          decoration:const  BoxDecoration(
-                borderRadius:  BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15)
-                    ),
-              color: Colors.white
-            ),
-          child: Wrap(children: [
-            Container(
-              width: Get.width,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15)
-                    ),
-              color: Colors.blue
-            ),
-              padding: const EdgeInsets.only(top:12,bottom:12),
-              child:  Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(width: 24,),
-                  Text(update?"Update Course Details":"Add New Course",
-                              style:const  TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white
-                                      )),
-                  IconButton(onPressed: ()=>Get.back(), icon: const Icon(Icons.close,color: Colors.white,))
-                ],
-              ),
-            ),    
-            textEditor(controller.courseNameController,"Course Name"),
-            textEditor(controller.courseDescriptionController,"Course Description"),
-            textEditor(controller.courseAuthorController,"Author Name"),
-            textEditor(controller.courseImageController,"Course Image Url"),
-            createCourseButton(update,courseId),
-            const SizedBox(height: 30,)
-          ]),
+    return Container(
+      //height: Get.height-Get.statusBarHeight,
+      decoration:const  BoxDecoration(
+            borderRadius:  BorderRadius.only(
+                topLeft: Radius.circular(15),
+                topRight: Radius.circular(15)
+                ),
+          color: Colors.white
         ),
-        if(controller.loading.value)
-        const Center(child:CircularProgressIndicator())
-      ],
+      child:controller.loading.value?
+      const CircularProgressIndicator()
+      : Wrap(children: [
+        Container(
+          width: Get.width,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15),
+                topRight: Radius.circular(15)
+                ),
+          color: Colors.blue
+        ),
+          padding: const EdgeInsets.only(top:12,bottom:12),
+          child:  Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const SizedBox(width: 24,),
+              Text(update?"Update Course Details":"Add New Course",
+                          style:const  TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white
+                                  )),
+              IconButton(onPressed: ()=>Get.back(), icon: const Icon(Icons.close,color: Colors.white,))
+            ],
+          ),
+        ),    
+        textEditor(controller.courseNameController,"Course Name"),
+        textEditor(controller.courseDescriptionController,"Course Description"),
+        textEditor(controller.courseAuthorController,"Author Name"),
+        textEditor(controller.courseImageController,"Course Image Url"),
+        createCourseButton(update,courseId),
+        const SizedBox(height: 30,)
+      ]),
     );
   }
 

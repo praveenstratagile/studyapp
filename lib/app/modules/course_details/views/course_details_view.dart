@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:studyapp/app/modules/course_details/model/Lesson_model.dart';
+import 'package:youtube/youtube_thumbnail.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../controllers/course_details_controller.dart';
 
@@ -55,19 +57,13 @@ class CourseDetailsView extends GetView<CourseDetailsController> {
             children: [
               
               const SizedBox(height: 10,),
+              Image.network(YoutubeThumbnail(youtubeId:YoutubePlayer.convertUrlToId(lesson.lessonVideoUrl??"")).standard()),
               Text("${(index+1).toString()}. ${lesson.lessonName}",
                   style: const TextStyle(color: Colors.blue,fontWeight: FontWeight.w500,fontSize: 20),
                   textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10,),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("${lesson.description}",
-                    style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 15),
-                    textAlign: TextAlign.left,
-      
-                ),
-              ),
+              
               
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -126,7 +122,7 @@ class CourseDetailsView extends GetView<CourseDetailsController> {
               ),
             ),    
             textEditor(controller.lessonNameController,"Lesson Name"),
-            textEditor(controller.lessonDescriptionController,"Lesson Description"),
+            textEditor(controller.lessonDescriptionController,"Lesson Description",maxLine:3),
             textEditor(controller.lessonVideoController,"Youtube Video Url"),
             createCourseButton(update,lessonId),
             const SizedBox(height: 30,)
@@ -155,11 +151,12 @@ class CourseDetailsView extends GetView<CourseDetailsController> {
   }
 
 
-  Widget textEditor(TextEditingController controller,String label){
+  Widget textEditor(TextEditingController controller,String label,{int maxLine = 1}){
     return Padding(
       padding: const EdgeInsets.all(15),
       child: TextFormField(
         controller: controller,
+        maxLines:maxLine ,
         decoration:  InputDecoration(
           label: Text(label),
           border: const OutlineInputBorder(

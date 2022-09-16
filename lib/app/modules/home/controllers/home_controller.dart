@@ -62,10 +62,10 @@ setTextFieldValues(CourseModel course){
     loading.value=true;
           await _collection.doc()
         .set(course)
-        .whenComplete(() {
+        .whenComplete(() async{
           Get.back();
           Get.snackbar("Successful", "Course added Successfully!");
-          readCourses();
+          await readCourses();
         })
         .catchError((e) {
          Get.snackbar("Error", e.toString());
@@ -116,10 +116,10 @@ setTextFieldValues(CourseModel course){
 
   editCourse(Map<String, dynamic> course,String courseId)async{
     loading.value =true;
-      await _collection.doc(courseId).update(course).whenComplete(()  {
+      await _collection.doc(courseId).update(course).whenComplete(()  async {
         Get.back();
         Get.snackbar("Success", "Course updated Successfully");
-        readCourses();
+        await readCourses();
          
       }).onError((error, stackTrace) {
         Get.snackbar("Failed", error.toString());
@@ -129,21 +129,30 @@ setTextFieldValues(CourseModel course){
 
   deleteCourse(String courseId)async{
     Get.defaultDialog(title: "Delete?",middleText: "Are you sure want to delete?",
-    onConfirm: (() async{
+    confirm: InkWell(
+      onTap:()async{
         loading.value=true;
-   await  _collection.doc(courseId).delete().whenComplete(() {
+          final batch = _fireStore.batch();
+          var snapshots = await _collection.doc(courseId).collection("lessons").get();
+          for (var doc in snapshots.docs) {
+            batch.delete(doc.reference);
+          }
+          batch.delete(_collection.doc(courseId));
+          await batch.commit();
+        Get.back();
         Get.snackbar("Success", "Course Deleted Successfully!");
-        readCourses();
-    });
+        await readCourses();
+
     loading.value=false;
-    }),
-    confirm: Container(
-      padding: const EdgeInsets.all(9),
-      decoration: BoxDecoration(
-        color: Colors.blue,
-        borderRadius: BorderRadius.circular(20),
-        
-      ),child: const Text("Delete",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),),
+    },
+      child: Container(
+        padding: const EdgeInsets.all(9),
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(20),
+          
+        ),child: const Text("Delete",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),),
+      ),
     ),
     onCancel: (){}
     );
