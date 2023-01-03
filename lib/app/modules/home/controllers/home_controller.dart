@@ -94,7 +94,7 @@ setTextFieldValues(CourseModel course){
 
    readCourses() async{
     loading.value = true;
-    await _collection.get(const GetOptions()).then((QuerySnapshot query){
+    await _collection.get(const GetOptions(source: Source.server)).then((QuerySnapshot query){
         courseList.value = [];
         for (var element in query.docs) {
           courseList.add(CourseModel.fromDocumentSnapshot(element));

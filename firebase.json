@@ -1,15 +1,45 @@
 {
   "emulators": {
     "firestore": {
+      
       "port": 5656
     },
     "ui": {
       "enabled": true,
       "port": 5566
+    },
+    "auth": {
+      "port": 5666
+    },
+    "functions": {
+      "port": 5001
+    },
+    "database": {
+      "port": 9000
+    },
+    "hosting": {
+      "port": 5000
+    },
+    "storage": {
+      "port": 9199
     }
   },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
+  },
+  "functions": {
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log"
+    ],
+    "predeploy": [
+      "npm --prefix \"$RESOURCE_DIR\" run lint"
+    ]
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }

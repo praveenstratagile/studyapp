@@ -9,16 +9,16 @@ import 'package:studyapp/firebase_options.dart';
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+ await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   FirebaseFirestore.instance.settings =
     const Settings(
-      host: "192.168.129.130:5566",
       sslEnabled: false,
       persistenceEnabled: false);
-  //FirebaseFirestore.instance.useFirestoreEmulator('localhost', 5566);
-
+   FirebaseFirestore.instance.useFirestoreEmulator('localhost', 5656);
+ 
+    
   runApp(  GetMaterialApp(
     initialBinding: HomeBinding(),
     getPages: AppPages.routes,
